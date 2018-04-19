@@ -47,17 +47,17 @@ class ListaEscolha extends Component {
   }
 
   recuperaListagemPessoas() {
-    const listagemPessoasGodQueVaoTrazerBoloPogChamp = [
-      'Renan Verissimo',
-      'Phills Bad man',
-      'Eric KappaPride',
-      'Leo Pederasta',
-      'Nogueira 4Head',
-      'Vitin BacknoKibe'
-    ];
-
-    this.setState({
-      pessoasDisponiveis: listagemPessoasGodQueVaoTrazerBoloPogChamp
+    fetch('https://queroboli.herokuapp.com/boli-listagem-pessoas-disponiveis', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+    })
+    .then((res) => res.json())
+    .then((res) => {
+      this.setState({
+        pessoasDisponiveis: res.pessoasDisponiveis
+      })
     })
   }
 
