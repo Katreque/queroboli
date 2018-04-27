@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import './App.css';
-import Moment from 'moment'
 
 class App extends Component {
   render() {
@@ -35,7 +34,6 @@ class ListaEscolha extends Component {
   }
 
   componentDidMount() {
-    this.recuperaListagemPessoas();
     this.controleTempo();
     this.dataHoje();
   }
@@ -55,42 +53,37 @@ class ListaEscolha extends Component {
     })
     .then((res) => res.json())
     .then((res) => {
+      let array = res.pessoas.map((pessoa) => {return pessoa.pessoa})
       this.setState({
-        pessoasDisponiveis: res.pessoasDisponiveis
+        pessoasDisponiveis: array
+      })
+    })
+  }
+
+  recuperaPessoaEscolhida() {
+    fetch('https://queroboli.herokuapp.com/boli-pessoa-escolhida', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+    })
+    .then((res) => res.json())
+    .then((res) => {
+      let array = res.pessoa.map((pessoa) => {return pessoa.pessoa})
+      this.setState({
+        pessoaEscolhida: array
       })
     })
   }
 
   controleTempo() {
-    var aguardaHorario = setInterval(() =>{
-      if (Moment(new Date()).hour() === 8) {
-        clearInterval(aguardaHorario);
+    this.recuperaListagemPessoas();
+    this.recuperaPessoaEscolhida();
 
-        setInterval(() => {
-          this.escolhePessoa(this.state.pessoasDisponiveis);
-          this.dataHoje();
-        }, 24*60*60*1000)
-      }
-
-      this.escolhePessoa(this.state.pessoasDisponiveis);
-      this.dataHoje();
-    }, 3000)
-  }
-
-  escolhePessoa(pessoasDisponiveis) {
-    if (pessoasDisponiveis.length !== 0) {
-      let index = Math.floor(Math.random() * pessoasDisponiveis.length);
-      let _pessoasDisponiveisTemp = pessoasDisponiveis;
-      let escolhida = _pessoasDisponiveisTemp.splice(index, 1);
-
-      this.setState({
-        pessoaEscolhida: escolhida,
-        pessoasDisponiveis: _pessoasDisponiveisTemp
-      })
-    } else {
+    setInterval(() => {
       this.recuperaListagemPessoas();
-      this.escolhePessoa(this.state.pessoasDisponiveis);
-    }
+      this.recuperaPessoaEscolhida();
+    }, 1000)
   }
 
   render() {
